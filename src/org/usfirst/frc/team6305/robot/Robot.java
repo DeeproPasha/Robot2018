@@ -79,31 +79,31 @@ public class Robot extends IterativeRobot {
 	}
 	
 	public void forward() {
-		frontLeft.set(-0.25);
-		frontRight.set(0.25);
-		backLeft.set(-0.25);
-		backRight.set(0.25);
+		frontLeft.set(-0.5);
+		frontRight.set(0.5);
+		backLeft.set(-0.5);
+		backRight.set(0.5);
 	}
 	
 	public void backward() {
-		frontLeft.set(0.25);
-		frontRight.set(-0.25);
-		backLeft.set(0.25);
-		backRight.set(-0.25);
+		frontLeft.set(0.5);
+		frontRight.set(-0.5);
+		backLeft.set(0.5);
+		backRight.set(-0.5);
 	}
 	
 	public void leftTurn() {
-		frontLeft.set(-0.25);
-		backLeft.set(-0.25);
-		frontRight.set(-0.25);
-		backRight.set(-0.25);
+		frontLeft.set(0.5);
+		backLeft.set(0.5);
+		frontRight.set(0.5);
+		backRight.set(0.5);
 	}
 	
 	public void rightTurn() {
-		frontRight.set(0.25);
-		backRight.set(0.25);
-		frontLeft.set(0.25);
-		backLeft.set(0.25);
+		frontRight.set(-0.5);
+		backRight.set(-0.5);
+		frontLeft.set(-0.5);
+		backLeft.set(-0.5);
 	}
 		
 	
@@ -127,6 +127,7 @@ public class Robot extends IterativeRobot {
 		//had to assign it here, woulddn't work other way
 		//lkjkljlkjkl
 	    gyro.calibrate();
+	    gyro.reset();
 	}
 
 	/**
@@ -147,7 +148,7 @@ public class Robot extends IterativeRobot {
 		time.reset();
 		//starts
 		time.start();
-		gyro.reset();
+		
 		
 		
 		autoSelected = chooser.getSelected();
@@ -165,8 +166,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void autonomousPeriodic() {
 		
-		double angle = gyro.getAngle();
-		System.out.println(angle);
+		System.out.println(gyro.getAngle());
 		//switch (autoSelected) {
 		
 		//case customAuto:
@@ -186,6 +186,17 @@ public class Robot extends IterativeRobot {
 				
 		}
 		if(gameData.charAt(1) == 'R'){
+			forward();
+			if(time.get() >= 5) {
+				backward();
+			}
+			if(time.get() >= 10) {
+				leftTurn();
+			
+			}
+			if(time.get() >= 15) {
+				stop();
+			}
 				//put right code here.
 		}
 			//On the right side of the field for example
@@ -251,6 +262,7 @@ public class Robot extends IterativeRobot {
 	 */
 	@Override
 	public void testPeriodic() {
+		System.out.println(gyro.getAngle());
 	}
 }
 
