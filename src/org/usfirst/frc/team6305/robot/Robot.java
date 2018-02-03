@@ -7,54 +7,125 @@
 
 package org.usfirst.frc.team6305.robot;
 
-import org.usfirst.frc.team6305.robot.commands.TankDrive;
 
+
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.command.Command;
-import edu.wpi.first.wpilibj.command.Scheduler;
+import edu.wpi.first.wpilibj.IterativeRobot;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the TimedRobot
+ * functions corresponding to each mode, as described in the IterativeRobot
  * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the build.properties file in the
- * project.
+ * creating this project, you must also update the manifest file in the resource
+ * directory.
  */
-public class Robot extends TimedRobot {
-	public static OI m_oi;
-
-	Command teleopDrive, m_autonomousCommand;
-	SendableChooser<Command> m_chooser = new SendableChooser<>();
+/**
+ * IterativeRobot skeleton code for Team 6305
+ * @author Deepro Pasha
+ *
+ */
+public class Robot extends IterativeRobot {
+	//Wheels
+	//Didn't actually know what wheel ports were so just randomly assigned them
+	Spark frontLeft = new Spark(0);
+	Spark frontRight = new Spark(3);
+	Spark backLeft = new Spark(1);
+	Spark backRight = new Spark(4);
+	//intakeClaw
+	Spark intakeClaw = new Spark(7);
+	//fireman's ladder
+	Spark firemanLadder = new Spark(5);
+	//Joysticks for tankDrive
+	Joystick jStickL = new Joystick(0);
+	Joystick jStickR = new Joystick(1);
+	//CoDriver controller
+	XboxController xbox = new XboxController(2);
+	//Timer for autonomous
+	Timer time = new Timer();
+	//Gyro for autonomous, so it goes straight
 	
+	ADXRS450_Gyro gyro = new ADXRS450_Gyro();
+	//Encoder enc = new Encoder(0,1,false,Encoder.EncodingType.k4x)
+	
+	//For gyro
+	//static final double Kp = 0.03;
+	//Wasn't sure about order of this
+	//RobotDrive myDrive = new RobotDrive(backRight, backLeft, frontRight, frontLeft);
+	//Dashboard stuff I think
+	final String defaultAuto = "Default";
+	final String customAuto = "My Auto";
+	String gameData;
+	String autoSelected;
+	SendableChooser<String> chooser = new SendableChooser<>();
+
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
+	
+	public void stop() {
+		frontLeft.set(0);
+		frontRight.set(0);
+		backLeft.set(0);
+		backRight.set(0);
+	}
+	
+	public void forward() {
+		frontLeft.set(-0.25);
+		frontRight.set(0.25);
+		backLeft.set(-0.25);
+		backRight.set(0.25);
+	}
+	
+	public void backward() {
+		frontLeft.set(0.25);
+		frontRight.set(-0.25);
+		backLeft.set(0.25);
+		backRight.set(-0.25);
+	}
+	
+	public void leftTurn() {
+		frontLeft.set(-0.25);
+		backLeft.set(-0.25);
+		frontRight.set(-0.25);
+		backRight.set(-0.25);
+	}
+	
+	public void rightTurn() {
+		frontRight.set(0.25);
+		backRight.set(0.25);
+		frontLeft.set(0.25);
+		backLeft.set(0.25);
+	}
+		
+	
+	public void tankDrive(){
+		double leftSpeed = jStickL.getY();
+		double rightSpeed = -jStickR.getY();
+		
+		frontLeft.set(leftSpeed);
+		backLeft.set(leftSpeed);
+		
+		frontRight.set(rightSpeed);
+		backRight.set(rightSpeed);
+	}
+	
 	@Override
 	public void robotInit() {
-		m_oi = new OI();
-//		m_chooser.addDefault("Default Auto", new ExampleCommand());
-		// chooser.addObject("My Auto", new MyAutoCommand());
-		SmartDashboard.putData("Auto mode", m_chooser);
-		teleopDrive = new TankDrive();
-	}
-
-	/**
-	 * This function is called once each time the robot enters Disabled mode.
-	 * You can use it to reset any subsystem information you want to clear when
-	 * the robot is disabled.
-	 */
-	@Override
-	public void disabledInit() {
-
-	}
-
-	@Override
-	public void disabledPeriodic() {
-		Scheduler.getInstance().run();
+		chooser.addDefault("Default Auto", defaultAuto);
+		chooser.addObject("My Auto", customAuto);
+		SmartDashboard.putData("Auto choices", chooser);
+		
+		//had to assign it here, woulddn't work other way
+	    gyro.calibrate();
 	}
 
 	/**
@@ -62,70 +133,123 @@ public class Robot extends TimedRobot {
 	 * between different autonomous modes using the dashboard. The sendable
 	 * chooser code works with the Java SmartDashboard. If you prefer the
 	 * LabVIEW Dashboard, remove all of the chooser code and uncomment the
-	 * getString code to get the auto name from the text box below the Gyro
+	 * getString line to get the auto name from the text box below the Gyro
 	 *
-	 * <p>You can add additional auto modes by adding additional commands to the
-	 * chooser code above (like the commented example) or additional comparisons
-	 * to the switch structure below with additional strings & commands.
+	 * You can add additional auto modes by adding additional comparisons to the
+	 * switch structure below with additional strings. If using the
+	 * SendableChooser make sure to add them to the chooser code above as well.
 	 */
 	@Override
 	public void autonomousInit() {
-		String gameData;
 		gameData = DriverStation.getInstance().getGameSpecificMessage();
-		if(gameData.charAt(0) == 'L')
-		{
-			//Put left auto code here
-		} else {
-			//Put right auto code here
-		}
+		//timer has to reset, just in case
+		time.reset();
+		//starts
+		time.start();
+		gyro.reset();
 		
-		m_autonomousCommand = m_chooser.getSelected();
-
-		/*
-		 * String autoSelected = SmartDashboard.getString("Auto Selector",
-		 * "Default"); switch(autoSelected) { case "My Auto": autonomousCommand
-		 * = new MyAutoCommand(); break; case "Default Auto": default:
-		 * autonomousCommand = new ExampleCommand(); break; }
-		 */
-
-		// schedule the autonomous command (example)
-		if (m_autonomousCommand != null) {
-			m_autonomousCommand.start();
-		}
+		
+		autoSelected = chooser.getSelected();
+		// autoSelected = SmartDashboard.getString("Auto Selector",
+		// defaultAuto);
+		System.out.println("Auto selected: " + autoSelected);
+		
 	}
 
 	/**
-	 * This function is called periodically during autonomous.
+	 * This function is called periodically during autonomous
 	 */
+	//Autonomous is experimental, feel free to correct if you want to
+	//Just tell me what I did wrong for future reference.
 	@Override
 	public void autonomousPeriodic() {
-		Scheduler.getInstance().run();
-	}
-
-	@Override
-	public void teleopInit() {
-		// This makes sure that the autonomous stops running when
-		// teleop starts running. If you want the autonomous to
-		// continue until interrupted by another command, remove
-		// this line or comment it out.
-		if (m_autonomousCommand != null) {
-			m_autonomousCommand.cancel();
+		
+		double angle = gyro.getAngle();
+		System.out.println(angle);
+		//switch (autoSelected) {
+		
+		//case customAuto:
+		if(gameData.charAt(0) == 'L'){
+			forward();
+			if(time.get() >= 5) {
+				backward();
+			}
+			if(time.get() >= 10) {
+				rightTurn();
+			
+			}
+			if(time.get() >= 15) {
+				stop();
+			}
+				//put left code here.
+				
 		}
-		teleopDrive.start();
+		if(gameData.charAt(1) == 'R'){
+				//put right code here.
+		}
+			//On the right side of the field for example
+			//Note: if there is a better way, please correct this
+			//This is really preliminary
+							
+			
+			
+			//turns Left
+			
+			// Put custom auto code here
+			
+		//case defaultAuto:
+			//just get across base line
+		//default:
+			//robot goes forward for 10 seconds
+			
+			
+			
+			
+			// Put default auto code here
+			
+	}
+	@Override
+	public void teleopInit(){
+		
 	}
 
 	/**
-	 * This function is called periodically during operator control.
+	 * This function is called periodically during operator control
 	 */
 	@Override
 	public void teleopPeriodic() {
-		Scheduler.getInstance().run();
+		tankDrive();
+		
+		//A Button would be intake for cubes
+		if(xbox.getAButton() == true){
+			intakeClaw.set(1);
+		}
+		//B Button would outtake cubes for emergency/strategy purposes
+		if(xbox.getBButton() == true){
+			intakeClaw.set(-1);
+		}
+		//X Button stops Claw
+		if(xbox.getXButton() == true){
+			intakeClaw.set(0);
+		}
+		//Start Button activates Ladder
+		if(xbox.getStartButton() == true){
+			firemanLadder.set(0.5);
+		}
+		//Back button stops Ladder
+		if(xbox.getBackButton() == true){
+			firemanLadder.set(0);
+		}
+		//Stick Button reverses Ladder
+		
+		
 	}
 
 	/**
-	 * This function is called periodically during test mode.
+	 * This function is called periodically during test mode
 	 */
 	@Override
 	public void testPeriodic() {
 	}
 }
+
