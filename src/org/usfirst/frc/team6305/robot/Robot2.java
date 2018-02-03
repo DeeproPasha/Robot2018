@@ -60,28 +60,51 @@ public class Robot2 extends IterativeRobot {
 	 * used for any initialization code.
 	 */
 	
-	public void leftDrive(){
-		frontLeft.set(0.5);
-		backLeft.set(0.5);
+	public void stop() {
+		frontLeft.set(0);
+		frontRight.set(0);
+		backLeft.set(0);
+		backRight.set(0);
 	}
 	
-	public void rightDrive(){
-		frontRight.set(0.5);
-		backRight.set(0.5);
+	public void forward() {
+		frontLeft.set(-0.25);
+		frontRight.set(0.25);
+		backLeft.set(-0.25);
+		backRight.set(0.25);
 	}
 	
+	public void backward() {
+		frontLeft.set(0.25);
+		frontRight.set(-0.25);
+		backLeft.set(0.25);
+		backRight.set(-0.25);
+	}
+	
+	public void leftTurn() {
+		frontLeft.set(-0.25);
+		backLeft.set(-0.25);
+		frontRight.set(-0.25);
+		backRight.set(-0.25);
+	}
+	
+	public void rightTurn() {
+		frontRight.set(0.25);
+		backRight.set(0.25);
+		frontLeft.set(0.25);
+		backLeft.set(0.25);
+	}
+		
 	
 	public void tankDrive(){
 		double leftSpeed = jStickL.getY();
-		double rightSpeed = jStickR.getY();
-		if(leftSpeed > 0){
-			frontLeft.set(leftSpeed);
-			backLeft.set(rightSpeed);
-		}
-		if(rightSpeed > 0){
-			frontLeft.set(rightSpeed);
-			backLeft.set(rightSpeed);
-		}
+		double rightSpeed = -jStickR.getY();
+		
+		frontLeft.set(leftSpeed);
+		backLeft.set(leftSpeed);
+		
+		frontRight.set(rightSpeed);
+		backRight.set(rightSpeed);
 	}
 	
 	@Override
@@ -90,8 +113,8 @@ public class Robot2 extends IterativeRobot {
 		chooser.addObject("My Auto", customAuto);
 		SmartDashboard.putData("Auto choices", chooser);
 		
-		//had to assign it here, wouldn't work other way
-		gyro = new AnalogGyro(1);
+		//had to assign it here, woulddn't work other way
+	    gyro.calibrate();
 	}
 
 	/**
@@ -112,6 +135,7 @@ public class Robot2 extends IterativeRobot {
 		timer.reset();
 		//starts
 		timer.start();
+		gyro.reset();
 		
 		
 		autoSelected = chooser.getSelected();
@@ -130,16 +154,28 @@ public class Robot2 extends IterativeRobot {
 	public void autonomousPeriodic() {
 		
 		double angle = gyro.getAngle();
-		switch (autoSelected) {
+		System.out.println(angle);
+		//switch (autoSelected) {
 		
-		case customAuto:
-			if(gameData.charAt(0) == 'L'){
+		//case customAuto:
+		if(gameData.charAt(0) == 'L'){
+			forward();
+			if(timer.get() >= 5) {
+				backward();
+			}
+			if(timer.get() >= 10) {
+				rightTurn();
+			
+			}
+			if(timer.get() >= 15) {
+				stop();
+			}
 				//put left code here.
 				
-			}
-			if(gameData.charAt(1) == 'R'){
+		}
+		if(gameData.charAt(1) == 'R'){
 				//put right code here.
-			}
+		}
 			//On the right side of the field for example
 			//Note: if there is a better way, please correct this
 			//This is really preliminary
@@ -149,18 +185,17 @@ public class Robot2 extends IterativeRobot {
 			//turns Left
 			
 			// Put custom auto code here
-			break;
-		case defaultAuto:
+			
+		//case defaultAuto:
 			//just get across base line
-		default:
+		//default:
 			//robot goes forward for 10 seconds
 			
 			
 			
 			
 			// Put default auto code here
-			break;
-		}
+			
 	}
 	@Override
 	public void teleopInit(){
@@ -173,6 +208,7 @@ public class Robot2 extends IterativeRobot {
 	@Override
 	public void teleopPeriodic() {
 		tankDrive();
+		
 		//A Button would be intake for cubes
 		if(xbox.getAButton() == true){
 			intakeClaw.set(1);
@@ -205,3 +241,6 @@ public class Robot2 extends IterativeRobot {
 	public void testPeriodic() {
 	}
 }
+
+
+	
