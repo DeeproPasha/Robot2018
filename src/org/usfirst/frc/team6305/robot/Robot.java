@@ -125,6 +125,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putData("Auto choices", chooser);
 		
 		//had to assign it here, woulddn't work other way
+		//lkjkljlkjkl
 	    gyro.calibrate();
 	}
 
