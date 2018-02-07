@@ -185,7 +185,7 @@ public class Robot extends IterativeRobot {
 		//case customAuto:
 		if(gameData.charAt(0) == 'L'){
 			forward();
-			if(time.get() >= 6) {
+			if(time.get() >= 5) {
 				backward();
 			}
 			if(time.get() >= 10) {
