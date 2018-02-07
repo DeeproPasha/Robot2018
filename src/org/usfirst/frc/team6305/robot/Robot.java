@@ -72,6 +72,8 @@ public class Robot extends IterativeRobot {
 	 * used for any initialization code.
 	 */
 	
+	
+	
 	public void stop() {
 		frontLeft.set(0);
 		frontRight.set(0);
@@ -274,6 +276,7 @@ public class Robot extends IterativeRobot {
 	@Override
 	public void testPeriodic() {
 		System.out.println(gyro.getAngle());
+		led.set(0.57);
 	}
 }
 
