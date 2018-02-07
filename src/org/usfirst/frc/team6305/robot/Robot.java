@@ -54,7 +54,8 @@ public class Robot extends IterativeRobot {
 	
 	ADXRS450_Gyro gyro = new ADXRS450_Gyro();
 	//Encoder enc = new Encoder(0,1,false,Encoder.EncodingType.k4x)
-	
+	//Blinkin is set up as a motor controller (Spark)
+	Spark led = new Spark(8);
 	//For gyro
 	//static final double Kp = 0.03;
 	//Wasn't sure about order of this
@@ -76,6 +77,8 @@ public class Robot extends IterativeRobot {
 		frontRight.set(0);
 		backLeft.set(0);
 		backRight.set(0);
+		//LEDs turned yellow
+		led.set(0.69);
 	}
 	
 	public void forward() {
@@ -83,6 +86,8 @@ public class Robot extends IterativeRobot {
 		frontRight.set(0.5);
 		backLeft.set(-0.5);
 		backRight.set(0.5);
+		//LEDs turned Dark Green
+		led.set(0.75);
 	}
 	
 	public void backward() {
@@ -90,6 +95,8 @@ public class Robot extends IterativeRobot {
 		frontRight.set(-0.5);
 		backLeft.set(0.5);
 		backRight.set(-0.5);
+		//LEDs turned RED
+		led.set(0.61);
 	}
 	
 	public void leftTurn() {
@@ -97,6 +104,8 @@ public class Robot extends IterativeRobot {
 		backLeft.set(0.5);
 		frontRight.set(0.5);
 		backRight.set(0.5);
+		//LEDs turned blue heartbeats
+		led.set(-0.23);
 	}
 	
 	public void rightTurn() {
@@ -104,6 +113,8 @@ public class Robot extends IterativeRobot {
 		backRight.set(-0.5);
 		frontLeft.set(-0.5);
 		backLeft.set(-0.5);
+		//LEDs turned blue heartbeats
+		led.set(-0.23);
 	}
 		
 	
