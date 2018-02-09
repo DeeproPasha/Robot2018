@@ -7,7 +7,7 @@
 
 package org.usfirst.frc.team6305.robot;
 
-import org.usfirst.frc.team6305.robot.commands.TankDrive;
+import org.usfirst.frc.team6305.robot.commands.driveTrain;
 
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.TimedRobot;
