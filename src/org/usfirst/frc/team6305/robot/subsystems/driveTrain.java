@@ -10,7 +10,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
  */
 public class driveTrain extends Subsystem {
 	
-	public static tankDrive instance = new tankDrive();
+	public static driveTrain instance = new driveTrain();
 	
 	Spark frontLeft = new Spark(RobotMap.frontLeft);
 	Spark frontRight = new Spark(RobotMap.frontRight);
@@ -25,7 +25,7 @@ public class driveTrain extends Subsystem {
         //setDefaultCommand(new MySpecialCommand());
     }
     
-    public void drive(double leftSpeed, double rightSpeed) {
+    public void tankDrive(double leftSpeed, double rightSpeed) {
     	frontRight.set(-leftSpeed);
 		backRight.set(-leftSpeed);
 		
