@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj.command.Subsystem;
 /**
  *
  */
-public class tankDrive extends Subsystem {
+public class driveTrain extends Subsystem {
 	
 	public static tankDrive instance = new tankDrive();
 	
